@@ -26,14 +26,14 @@ const router = createRouter({
   ],
 })
 
-const PUBLIC_ROUTES = ['/auth']
+const PUBLIC_ROUTES = ['/auth', '/home']
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
   if (!authStore.isInitialized) authStore.init()
 
   const isPublic = PUBLIC_ROUTES.includes(to.path)
-  if (authStore.isLoggedIn && isPublic) return '/home'
+  if (authStore.isLoggedIn && to.path === '/auth') return '/home'
   if (!authStore.isLoggedIn && !isPublic) return '/auth'
 })
 
