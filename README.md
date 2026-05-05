@@ -161,21 +161,6 @@ watch([currentIndex, isAnswered], () => {
 }, { immediate: true })
 ```
 
-**4. 收合動畫**
-
-使用 CSS Grid 的 `grid-template-rows: 0fr → 1fr` 過渡動畫，取代 `max-height` 方案。前者動畫範圍自動對齊實際內容高度，不會有卡頓感：
-
-```html
-<div :class="['grid transition-[grid-template-rows] duration-300',
-  isCollapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]']">
-  <div class="min-h-0 overflow-hidden"><!-- 內容 --></div>
-</div>
-```
-
-**5. 捲軸版面補償**
-
-切換 Tab 時捲軸出現／消失會造成版面跳動，以 `ResizeObserver` 動態測量捲軸寬度，在不需要捲動時補上等寬的 `padding-right`（macOS overlay scrollbar 自動跳過）。
-
 ## 🤖 使用 Claude 輔助開發
 
 這個專案全程使用 [Claude Code](https://claude.ai/code) 作為網站重構助手，從零到完整產品以**步驟式教學**的方式完成重構。
@@ -184,7 +169,7 @@ watch([currentIndex, isAnswered], () => {
 
 ```
 1. Claude 說明 React → Vue 的概念對照與 Vue 慣用寫法
-2. 我自己動手實作
+2. 自己動手實作
 3. Claude 檢查並指出問題（附正確寫法與原因）
 4. 完成一個 feature 後執行 /vue-review 做完整 code review
 ```
@@ -193,16 +178,17 @@ watch([currentIndex, isAnswered], () => {
 
 | 功能 | 此專案的使用場景 |
 |------|----------------|
-| **MCP 整合** | 設定 Notion MCP Server，讓 Claude 直接對 Notion Workspace 做 CRUD 操作建立學習筆記 |
 | **Plan Mode（規劃模式）** | 複雜的多檔案修改前先確認策略（Navigation Guard 流程、題庫新增規劃），不直接動檔案 |
 | **記憶系統（Memory）** | 跨對話記憶使用者背景（React 轉 Vue）、Notion 筆記格式規範、commit 訊息語言偏好 |
 | **CLAUDE.md（專案指令）** | 定義專案層級的規範（禁止 Options API、命名慣例、狀態管理原則、React ↔ Vue 對照表） |
 | **Custom Skills（自訂斜線指令）** | `/vue-review` 觸發程式碼審查；`/commit` 自動產生 Conventional Commits 訊息，定義於 `.claude/commands/` |
 | **Sub-Agent（子代理）** | `vue-code-reviewer` 自訂審查 agent，專門針對 Vue 3 + TypeScript 的程式碼做品質審查 |
+| **MCP 整合** | 設定 Notion MCP Server，讓 Claude 直接對 Notion Workspace 做 CRUD 操作建立學習筆記 |
 
 ### 使用 Vue 重構網站時遇到的困難
 
 **1. 響應式系統理解錯誤 → StatsSidebar 數據不更新**
+
 `pct`（完成百分比）和 `offset`（SVG 路徑長度）最初用普通變數計算，導致 props 傳入新數據後畫面不更新。根本原因是把 React「每次 render 重算」的思維套用到 Vue——Vue 的響應式系統只追蹤在 `computed` 或 `watchEffect` 中被讀取的依賴，普通變數不在追蹤範圍。改用 `computed` 後，任何 prop 變動都會自動重算。
 
 **2. SVG 屬性無效 → Vue template 的靜態屬性規則**
